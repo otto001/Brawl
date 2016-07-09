@@ -90,5 +90,35 @@ void APlayerBrawler::Movement(float Direction)
 	{
 		SprintDoubletapDelay = 0;
 	}
-	Super::Movement(Direction);
+	
+	if (Direction == 0 && bSprint)
+	{
+		ChangeMovementMode(EBrawlerMovementMode::Sprint, EChangeModeSetting::RemoveOnly);
+	}
+	if (ImmobileTimer <= 0)
+	{
+
+		if (MovementMode == EBrawlerMovementMode::EdgeHold && Direction != 0 && Direction != CurrentDirection.Y)
+		{
+			ChangeMovementMode(EBrawlerMovementMode::Falling, EChangeModeSetting::Override);
+		}
+
+		if (MovementMode == EBrawlerMovementMode::ForceMovement)
+		{
+
+			if (ForceMovementData.bAbortable && ((Direction != CurrentDirection.Y && Direction != 0) || (ForceMovementData.bInputDependent && Direction == 0)))
+			{
+				ChangeMovementMode(EBrawlerMovementMode::Walk, EChangeModeSetting::Override);
+			}
+		}
+		else if (Direction != 0)
+		{
+			if (bWalkBackwards)
+			{
+				Direction *= -1;
+			}
+			AddMovementInput(FVector(0, 1, 0), Direction);
+		}
+
+	}
 }

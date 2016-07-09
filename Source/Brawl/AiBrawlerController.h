@@ -12,6 +12,7 @@ class BRAWL_API AAiBrawlerController : public AAIController
 {
 	GENERATED_BODY()
 	
+private:
 	UPROPERTY(transient)
 	class UBlackboardComponent* BlackboardComponent;
 	
@@ -24,6 +25,13 @@ public:
 
 	virtual void Possess(APawn* InPawn) override;
 	
+
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Movement)
+		float AcceptableDistance;
+
+
+
 	uint8 KeyId_Player;
 	uint8 KeyId_Destination;
 };

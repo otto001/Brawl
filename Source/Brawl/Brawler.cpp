@@ -26,6 +26,8 @@ void ABrawler::Tick(float DeltaTime)
 	Super::Tick( DeltaTime );
 
 	CurrentDirection = GetDirection();
+	bOnGround = GetOnGround();
+
 
 	if (GetVelocity().Y != 0 && (int(MovementMode) < 4 || MovementMode == EBrawlerMovementMode::ForceMovement))
 	{
@@ -42,7 +44,7 @@ void ABrawler::Tick(float DeltaTime)
 	}
 
 	ObstacleScan();
-	bOnGround = OnGround();
+
 	if (bOnGround)
 	{
 		bWalljumped = false;
@@ -103,6 +105,7 @@ void ABrawler::Tick(float DeltaTime)
 
 }
 
+
 void ABrawler::StartSprint()
 {
 	bShift = true;
@@ -126,6 +129,7 @@ void ABrawler::EndJump()
 	bSpace = false;
 }
 
+
 FVector ABrawler::GetDirection()
 {
 	FVector Direction = FVector::ZeroVector;
@@ -137,7 +141,7 @@ FVector ABrawler::GetDirection()
 	return Direction;
 }
 
-bool ABrawler::OnGround()
+bool ABrawler::GetOnGround()
 {
 	float CapsuleHalfHeight, CapsuleRadius;
 	GetCapsuleComponent()->GetScaledCapsuleSize(CapsuleRadius, CapsuleHalfHeight);
@@ -157,6 +161,7 @@ bool ABrawler::OnGround()
 
 	return BoxTrace.bBlockingHit;
 }
+
 
 void ABrawler::ChangeMovementMode(EBrawlerMovementMode NewMode, EChangeModeSetting Setting)
 {
@@ -316,39 +321,6 @@ void ABrawler::ChangeMovementMode(EBrawlerMovementMode NewMode, EChangeModeSetti
 
 }
 
-void ABrawler::Movement(float Direction)
-{
-	if (Direction == 0 && !bShift && bSprint)
-	{
-		ChangeMovementMode(EBrawlerMovementMode::Sprint, EChangeModeSetting::RemoveOnly);
-	}
-	if (ImmobileTimer <= 0)
-	{
-
-		if (MovementMode == EBrawlerMovementMode::EdgeHold && Direction != 0 && Direction != CurrentDirection.Y)
-		{
-			ChangeMovementMode(EBrawlerMovementMode::Falling, EChangeModeSetting::Override);
-		}
-
-		if (MovementMode == EBrawlerMovementMode::ForceMovement)
-		{
-			
-			if (ForceMovementData.bAbortable && ((Direction != CurrentDirection.Y && Direction != 0) || (ForceMovementData.bInputDependent && Direction == 0)))
-			{
-				ChangeMovementMode(EBrawlerMovementMode::Walk, EChangeModeSetting::Override);
-			}
-		}
-		else if (Direction != 0)
-		{
-			if (bWalkBackwards)
-			{
-				Direction *= -1;
-			}
-			AddMovementInput(FVector(0, 1, 0), Direction);
-		}
-
-	}
-}
 
 void ABrawler::ObstacleScan()
 {
@@ -364,7 +336,7 @@ void ABrawler::ObstacleScan()
 	FCollisionQueryParams CollisionParams;
 	CollisionParams.AddIgnoredActor(this);
 
-	if (bShift || bSpace)
+	if (bSprint || bSpace)
 	{
 		VaultScan();
 	}
@@ -557,6 +529,7 @@ bool ABrawler::VaultScan()
 	return false;
 }
 
+
 void ABrawler::BrawlerAction(EBrawlerAction NewAction)
 {
 	switch (NewAction)
@@ -566,6 +539,7 @@ void ABrawler::BrawlerAction(EBrawlerAction NewAction)
 		break;
 	}
 }
+
 
 void ABrawler::BrawlerJump()
 {

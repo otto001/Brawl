@@ -19,18 +19,30 @@
 EBTNodeResult::Type UBTTask_BrawlerMoveTo::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	AAiBrawlerController* BrawlerController = Cast<AAiBrawlerController>(OwnerComp.GetAIOwner());
+	AAiBrawler* Brawler = Cast<AAiBrawler>(BrawlerController->GetPawn());
 
-	APlayerBrawler* Player = Cast<APlayerBrawler>(OwnerComp.GetBlackboardComponent()->GetValue<UBlackboardKeyType_Object>(BrawlerController->KeyId_Player));
+	//APlayerBrawler* Player = Cast<APlayerBrawler>(OwnerComp.GetBlackboardComponent()->GetValue<UBlackboardKeyType_Object>(BrawlerController->KeyId_Player));
 
-	if (Player)
+	FVector Destination = OwnerComp.GetBlackboardComponent()->GetValue<UBlackboardKeyType_Vector>(BrawlerController->KeyId_Destination);
+
+	if ((Destination - Brawler->GetActorLocation()).Size() > BrawlerController->AcceptableDistance)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Move");
+
+
+
+
+
+
+
+
+
+
 		return EBTNodeResult::Succeeded;
 	}
 	else
 	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "There");
 		return EBTNodeResult::Failed;
-
 	}
 	return EBTNodeResult::Failed;
 }

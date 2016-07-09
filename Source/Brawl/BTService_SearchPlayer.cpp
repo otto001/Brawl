@@ -31,8 +31,7 @@ void UBTService_SearchPlayer::TickNode(UBehaviorTreeComponent& OwnerComp, uint8*
 		if (Player)
 		{
 			OwnerComp.GetBlackboardComponent()->SetValue<UBlackboardKeyType_Object>(BrawlerController->KeyId_Player, Player);
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Found");
-
+			OwnerComp.GetBlackboardComponent()->SetValue<UBlackboardKeyType_Vector>(BrawlerController->KeyId_Destination, Player->GetActorLocation());
 		}
 
 	}

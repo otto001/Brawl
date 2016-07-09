@@ -63,7 +63,7 @@ struct FForceMovementStruct
 		return FMath::Abs(Destination - ReferenceActor->GetActorLocation().Y);
 	}
 
-	void SetForceMovementData(float NewDestination, float NewSpeed, bool NewbWalkBackwards, int32 NewEndDirection, bool NewbAbortable = false, bool NewbInputDependent = false, EBrawlerMovementMode NewNextMovementMode = EBrawlerMovementMode::Walk)
+	void SetForceMovementData(float NewDestination, float NewSpeed, bool NewbWalkBackwards, int32 NewEndDirection = 0, bool NewbAbortable = false, bool NewbInputDependent = false, EBrawlerMovementMode NewNextMovementMode = EBrawlerMovementMode::Walk)
 	{
 		Destination = NewDestination;
 		Speed = NewSpeed;
@@ -167,12 +167,13 @@ public:
 	void BrawlerJump();
 	void BrawlerAction(EBrawlerAction NewAction);
 
-	UFUNCTION(BlueprintImplementableEvent, Category = Movement)
-		void EdgeClimb();
+	//UFUNCTION(BlueprintImplementableEvent, Category = Movement)
+	//	void EdgeClimb();
 	
 
 
-	void Movement(float Direction);
+	//void Movement(float Direction);
+
 	void StartSprint();
 	void EndSprint();
 	void StartJump();
@@ -184,7 +185,7 @@ private:
 	
 
 	void ObstacleScan();
-	bool OnGround();
+	bool GetOnGround();
 	/*void PressCrouch();
 	void ReleaseCrouch();*/
 
