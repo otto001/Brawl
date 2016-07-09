@@ -118,16 +118,16 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Movement)
 		float WalkBackwardsSpeed = 250;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Movement)
-		float WallHoldTime;
+		float WallHoldTime = 0.33f;;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Movement)
-		float WallSlideSpeed;
+		float WallSlideSpeed = 0.8f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement)
 		bool bOnGround;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement)
 		bool bWalljumped;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Parkour)
-		float ArmLength;
+		float ArmLength = 16.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Parkour)
 		float ScanningTolerance = 2.f;
 	
@@ -172,8 +172,7 @@ public:
 	
 
 
-	//void Movement(float Direction);
-
+	void Movement(float Direction);
 	void StartSprint();
 	void EndSprint();
 	void StartJump();
@@ -189,11 +188,8 @@ private:
 	/*void PressCrouch();
 	void ReleaseCrouch();*/
 
-
-	//Keys
-	bool bShift;
-	bool bSpace;
-
+	//State bools
+	bool bJump;
 	
 
 	//Walljump

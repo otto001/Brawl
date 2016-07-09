@@ -10,8 +10,6 @@
 ABrawler::ABrawler()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	WallHoldTime = 0.33f;
-	WallSlideSpeed = 1;
 }
 
 
@@ -108,25 +106,24 @@ void ABrawler::Tick(float DeltaTime)
 
 void ABrawler::StartSprint()
 {
-	bShift = true;
+	bSprint = true;
 	ChangeMovementMode(EBrawlerMovementMode::Sprint, EChangeModeSetting::Add);
 }
 
 void ABrawler::EndSprint()
 {
-	bShift = false;
+	bSprint = false;
 	ChangeMovementMode(EBrawlerMovementMode::Sprint, EChangeModeSetting::RemoveOnly);
 }
 
 void ABrawler::StartJump()
 {
-	BrawlerAction(EBrawlerAction::Jump);
-	bSpace = true;
+	bJump = true;
 }
 
 void ABrawler::EndJump()
 {
-	bSpace = false;
+	bJump = false;
 }
 
 
@@ -162,6 +159,40 @@ bool ABrawler::GetOnGround()
 	return BoxTrace.bBlockingHit;
 }
 
+void ABrawler::Movement(float Direction)
+{
+
+	if (Direction == 0 && bSprint)
+	{
+		ChangeMovementMode(EBrawlerMovementMode::Sprint, EChangeModeSetting::RemoveOnly);
+	}
+	if (ImmobileTimer <= 0)
+	{
+
+		if (MovementMode == EBrawlerMovementMode::EdgeHold && Direction != 0 && Direction != CurrentDirection.Y)
+		{
+			ChangeMovementMode(EBrawlerMovementMode::Falling, EChangeModeSetting::Override);
+		}
+
+		if (MovementMode == EBrawlerMovementMode::ForceMovement)
+		{
+
+			if (ForceMovementData.bAbortable && ((Direction != CurrentDirection.Y && Direction != 0) || (ForceMovementData.bInputDependent && Direction == 0)))
+			{
+				ChangeMovementMode(EBrawlerMovementMode::Walk, EChangeModeSetting::Override);
+			}
+		}
+		else if (Direction != 0)
+		{
+			if (bWalkBackwards)
+			{
+				Direction *= -1;
+			}
+			AddMovementInput(FVector(0, 1, 0), Direction);
+		}
+
+	}
+}
 
 void ABrawler::ChangeMovementMode(EBrawlerMovementMode NewMode, EChangeModeSetting Setting)
 {
@@ -336,15 +367,21 @@ void ABrawler::ObstacleScan()
 	FCollisionQueryParams CollisionParams;
 	CollisionParams.AddIgnoredActor(this);
 
-	if (bSprint || bSpace)
+	if (bSprint || bJump && GetVelocity().Y != 0)
 	{
 		VaultScan();
 	}
 
+	
+
 	// Edge & Wallslide
 	if (MovementMode != EBrawlerMovementMode::Vault)
 	{
-		
+		if (bJump)
+		{
+			BrawlerAction(EBrawlerAction::Jump);
+
+		}
 
 		FHitResult BoxTrace;
 
@@ -421,7 +458,7 @@ void ABrawler::ObstacleScan()
 				}
 
 			}
-			else if ((bSpace && int(MovementMode) <= 3) || MovementMode == EBrawlerMovementMode::Falling)
+			else if ((bJump && int(MovementMode) <= 3) || MovementMode == EBrawlerMovementMode::Falling)
 			{
 				float Height = BoxTrace.Location.Z - GetActorLocation().Z + CapsuleHalfHeight;
 				ChangeMovementMode(EBrawlerMovementMode::EdgeClimb, EChangeModeSetting::Add);
@@ -504,7 +541,7 @@ bool ABrawler::VaultScan()
 
 			DrawDebugPoint(GetWorld(), FVector(CurrentLocation.X, Destination, CurrentLocation.Z), 10, FColor::Emerald, true, 10);
 
-			GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Emerald, FString::SanitizeFloat(Distance));
+			//GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Emerald, FString::SanitizeFloat(Distance));
 
 			
 			VaultMontageCurrentThickness = Thickness;
@@ -512,7 +549,7 @@ bool ABrawler::VaultScan()
 
 			if (Distance > 0)
 			{
-				ForceMovementData.SetForceMovementData(Destination, SprintSpeed, false, Direction.Y, true, true, EBrawlerMovementMode::Vault);
+				ForceMovementData.SetForceMovementData(Destination, GetMovementComponent()->GetMaxSpeed(), false, Direction.Y, true, true, EBrawlerMovementMode::Vault);
 			}
 			else
 			{
@@ -563,7 +600,7 @@ void ABrawler::BrawlerJump()
 		}
 		else
 		{
-			if (!VaultScan() && MovementMode != EBrawlerMovementMode::Land && MovementMode != EBrawlerMovementMode::ForceMovement)
+			if (MovementMode != EBrawlerMovementMode::Land && MovementMode != EBrawlerMovementMode::ForceMovement)
 			{
 				Jump();
 			}

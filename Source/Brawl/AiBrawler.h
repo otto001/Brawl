@@ -21,5 +21,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Behavior)
 	class UBehaviorTree* BehaviorTree;
+
+
+	void Movement(float Time);
+
+
 	
 };

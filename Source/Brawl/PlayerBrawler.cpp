@@ -15,13 +15,38 @@ void APlayerBrawler::SetupPlayerInputComponent(class UInputComponent* InputCompo
 
 	InputComponent->BindAxis("Movement", this, &APlayerBrawler::Movement);
 
-	InputComponent->BindAction("Sprint", IE_Pressed, this, &ABrawler::StartSprint);
-	InputComponent->BindAction("Sprint", IE_Released, this, &ABrawler::EndSprint);
+	InputComponent->BindAction("Sprint", IE_Pressed, this, &APlayerBrawler::StartSprint);
+	InputComponent->BindAction("Sprint", IE_Released, this, &APlayerBrawler::EndSprint);
 
-	InputComponent->BindAction("Jump", IE_Pressed, this, &ABrawler::StartJump);
-	InputComponent->BindAction("Jump", IE_Released, this, &ABrawler::EndJump);
+	InputComponent->BindAction("Jump", IE_Pressed, this, &APlayerBrawler::StartJump);
+	InputComponent->BindAction("Jump", IE_Released, this, &APlayerBrawler::EndJump);
 
 
+}
+
+
+void APlayerBrawler::StartSprint()
+{
+	bKey_Sprint = true;
+	Super::StartSprint();
+}
+
+void APlayerBrawler::EndSprint()
+{
+	bKey_Sprint = false;
+	Super::EndSprint();
+}
+
+void APlayerBrawler::StartJump()
+{
+	bKey_Jump = true;
+	Super::StartJump();
+}
+
+void APlayerBrawler::EndJump()
+{
+	bKey_Jump = false;
+	Super::EndJump();
 }
 
 void APlayerBrawler::BeginPlay()
@@ -45,43 +70,52 @@ void APlayerBrawler::Movement(float Direction)
 	if (!bSprint)
 	{
 		//SprintDoubletapTimer
-		if (SprintDoubletapDelay > MaxSprintDoubletapDelay || SprintDoubletapDirection == -Direction)
+		if (bKey_Sprint)
 		{
-			SprintDoubletapDelay = SprintDoubletapDirection = 0;
-		}
-		else if (SprintDoubletapDelay > 0)
-		{
-			SprintDoubletapDelay += DeltaTime;
-		}
-
-		//Doubletap Sprint init
-		if (SprintDoubletapDirection != 0 && Direction == 0 && SprintDoubletapDelay == 0)
-		{
-			SprintDoubletapDelay = DeltaTime;
-		}
-		else if (SprintDoubletapDelay > 0 && SprintDoubletapDirection == Direction)
-		{
-
+			bSprint = true;
 			ChangeMovementMode(EBrawlerMovementMode::Sprint, EChangeModeSetting::Add);
-			
-			SprintDoubletapDelay = 0;
-
 		}
-
-		if (SprintDoubletapDelay == 0)
+		else
 		{
-			if (Direction > 0)
+			if (SprintDoubletapDelay > MaxSprintDoubletapDelay || SprintDoubletapDirection == -Direction)
 			{
-				SprintDoubletapDirection = 1;
+				SprintDoubletapDelay = SprintDoubletapDirection = 0;
 			}
-			else if (Direction < 0)
+			else if (SprintDoubletapDelay > 0)
 			{
-				SprintDoubletapDirection = -1;
+				SprintDoubletapDelay += DeltaTime;
 			}
-			else
+
+			//Doubletap Sprint init
+			if (SprintDoubletapDirection != 0 && Direction == 0 && SprintDoubletapDelay == 0)
 			{
-				SprintDoubletapDirection = 0;
+				SprintDoubletapDelay = DeltaTime;
 			}
+			else if (SprintDoubletapDelay > 0 && SprintDoubletapDirection == Direction)
+			{
+
+				ChangeMovementMode(EBrawlerMovementMode::Sprint, EChangeModeSetting::Add);
+
+				SprintDoubletapDelay = 0;
+
+			}
+
+			if (SprintDoubletapDelay == 0)
+			{
+				if (Direction > 0)
+				{
+					SprintDoubletapDirection = 1;
+				}
+				else if (Direction < 0)
+				{
+					SprintDoubletapDirection = -1;
+				}
+				else
+				{
+					SprintDoubletapDirection = 0;
+				}
+			}
+
 		}
 		
 
@@ -91,34 +125,7 @@ void APlayerBrawler::Movement(float Direction)
 		SprintDoubletapDelay = 0;
 	}
 	
-	if (Direction == 0 && bSprint)
-	{
-		ChangeMovementMode(EBrawlerMovementMode::Sprint, EChangeModeSetting::RemoveOnly);
-	}
-	if (ImmobileTimer <= 0)
-	{
-
-		if (MovementMode == EBrawlerMovementMode::EdgeHold && Direction != 0 && Direction != CurrentDirection.Y)
-		{
-			ChangeMovementMode(EBrawlerMovementMode::Falling, EChangeModeSetting::Override);
-		}
-
-		if (MovementMode == EBrawlerMovementMode::ForceMovement)
-		{
-
-			if (ForceMovementData.bAbortable && ((Direction != CurrentDirection.Y && Direction != 0) || (ForceMovementData.bInputDependent && Direction == 0)))
-			{
-				ChangeMovementMode(EBrawlerMovementMode::Walk, EChangeModeSetting::Override);
-			}
-		}
-		else if (Direction != 0)
-		{
-			if (bWalkBackwards)
-			{
-				Direction *= -1;
-			}
-			AddMovementInput(FVector(0, 1, 0), Direction);
-		}
-
-	}
+	Super::Movement(Direction);
 }
+
+

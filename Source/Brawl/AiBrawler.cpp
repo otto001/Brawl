@@ -21,3 +21,8 @@ void AAiBrawler::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
+
+void AAiBrawler::Movement(float Time)
+{
+
+}

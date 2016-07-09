@@ -28,10 +28,14 @@ EBTNodeResult::Type UBTTask_BrawlerMoveTo::ExecuteTask(UBehaviorTreeComponent& O
 	if ((Destination - Brawler->GetActorLocation()).Size() > BrawlerController->AcceptableDistance)
 	{
 
+		int8 Direction = 1;
+		if (Destination.Y < Brawler->GetActorLocation().Y)
+		{
+			Direction = -1;
+		}
 
 
-
-
+		Brawler->AddMovementInput(FVector(0, Direction, 0), Brawler->GetMovementComponent()->GetMaxSpeed());
 
 
 
