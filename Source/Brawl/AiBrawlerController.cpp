@@ -25,9 +25,9 @@ void AAiBrawlerController::Possess(APawn * InPawn)
 
 	if (Brawler && Brawler->BehaviorTree)
 	{
-		Blackboard->InitializeBlackboard(*Brawler->BehaviorTree->BlackboardAsset);
+		BlackboardComponent->InitializeBlackboard(*Brawler->BehaviorTree->BlackboardAsset);
 
-		AiKeyId = Blackboard->GetKeyID("Id");
+		KeyId_Player = BlackboardComponent->GetKeyID("Player");
 
 		BehaviorTreeComponent->StartTree(*Brawler->BehaviorTree);
 	}

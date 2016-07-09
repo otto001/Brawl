@@ -53,8 +53,6 @@ void APlayerBrawler::Movement(float Direction)
 		{
 			SprintDoubletapDelay += DeltaTime;
 		}
-		
-		UE_LOG(LogTemp, Warning, TEXT("%d, %f, %f"), SprintDoubletapDirection, Direction, SprintDoubletapDelay);
 
 		//Doubletap Sprint init
 		if (SprintDoubletapDirection != 0 && Direction == 0 && SprintDoubletapDelay == 0)

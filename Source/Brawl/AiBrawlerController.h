@@ -24,5 +24,6 @@ public:
 
 	virtual void Possess(APawn* InPawn) override;
 	
-	uint8 AiKeyId;
+	uint8 KeyId_Player;
+	uint8 KeyId_Destination;
 };
